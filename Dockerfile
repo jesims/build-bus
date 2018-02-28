@@ -7,7 +7,6 @@ WORKDIR /tmp
 
 RUN apk add --verbose --update --upgrade --no-cache \
 	bash \
-	the_silver_searcher \
 	build-base \
 	ca-certificates \
 	curl \
@@ -20,9 +19,14 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	openjdk8-jre \
 	openssh \
 	openssl \
+	postgresql \
 	py-pip \
 	python \
+	rsync \
+	ruby \
+	ruby-rdoc \
 	tar \
+	the_silver_searcher \
 	wget
 
 #--- Leiningen (from  https://github.com/Quantisan/docker-clojure/blob/master/alpine/lein/Dockerfile)
@@ -51,15 +55,31 @@ RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.9.0"]])' >
   && lein deps && rm project.clj
 
 #--- PhantomJS 
-
 # Refer: https://hub.docker.com/r/fgrehm/phantomjs2/builds/bh7pii47dsynpsbhtwd38nk/
 RUN curl -Ls https://github.com/arobson/docker-phantomjs2/releases/download/v2.1.1-20160523/dockerized-phantomjs.tar.gz | tar xz -C /
 RUN ln -s /usr/local/bin/phantomjs /usr/bin/phantomjs
 
+RUN node --version
 #--- Typical Node Tools
-RUN npm install --global \
+RUN npm install --global --unsafe-perm \
 	cljs \
 	gulp-cli \
 	lumo \
-	phantomjs \
+# Not sure we need if phantomjs installed above
+#	phantomjs \
 	wait-on
+
+#--- Typical Ruby Tools
+RUN gem install \
+    bundler
+
+#-- Typical Python Tools
+RUN pip install --upgrade \
+    awscli \
+    awsebcli
+
+RUN mvn --version
+RUN pg_dump --version
+RUN pg_restore --version
+RUN phantomjs --version
+RUN lumo --version
