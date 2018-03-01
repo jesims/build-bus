@@ -20,7 +20,7 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	gnupg \
 	jq \
 	nodejs-npm \
-	openjdk8-jre \
+	openjdk8 \
 	openssh \
 	openssl \
 	postgresql \
