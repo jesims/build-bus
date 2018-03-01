@@ -101,3 +101,4 @@ RUN pip install --upgrade \
 #-- Install Circle-CI Tools
 RUN git clone https://github.com/jesims/circleci-tools.git && chmod +x ./circleci-tools/cancel-redundant-builds.sh
 ENV PATH=$PATH:/tmp/circleci-tools/
+RUN node -v > .node_version
