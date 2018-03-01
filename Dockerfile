@@ -33,7 +33,8 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	ruby-rdoc \
 	tar \
 	the_silver_searcher \
-	wget
+	wget \
+	zip
 
 #--- Maven (from https://github.com/Zenika/alpine-maven/blob/master/jdk8/Dockerfile) 
 ENV PATH=$PATH:$MAVEN_HOME/bin
