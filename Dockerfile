@@ -29,6 +29,7 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	rsync \
 	ruby \
 	ruby-bundler \
+	ruby-dev \
 	ruby-irb \
 	ruby-rdoc \
 	tar \
