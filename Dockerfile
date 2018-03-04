@@ -101,6 +101,9 @@ RUN pip install --upgrade \
     awsebcli
 
 #-- Install Circle-CI Tools
-RUN git clone https://github.com/jesims/circleci-tools.git && chmod +x ./circleci-tools/cancel-redundant-builds.sh
+RUN git clone -b master https://github.com/jesims/circleci-tools.git \
+  && cd circleci-tools \
+  && git pull \
+  && chmod +x ./cancel-redundant-builds.sh
 ENV PATH=$PATH:/tmp/circleci-tools/
 RUN node -v > .node_version
