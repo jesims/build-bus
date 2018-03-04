@@ -24,8 +24,8 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	openssh \
 	openssl \
 	postgresql \
-	py-pip \
-	python \
+	py3-pip \
+	python3 \
 	rsync \
 	ruby \
 	ruby-bundler \
@@ -107,3 +107,4 @@ RUN git clone -b master https://github.com/jesims/circleci-tools.git \
   && chmod +x ./cancel-redundant-builds.sh
 ENV PATH=$PATH:/tmp/circleci-tools/
 RUN node -v > .node_version
+RUN python --version
