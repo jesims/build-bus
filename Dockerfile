@@ -24,8 +24,8 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	openssh \
 	openssl \
 	postgresql \
-	py3-pip \
 	python3 \
+	py3-pip \
 	rsync \
 	ruby \
 	ruby-bundler \
@@ -63,6 +63,7 @@ RUN mkdir -p $LEIN_INSTALL \
   && echo "Fetching lein standalone zip ..." \
   && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip \
   && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip.asc \
+  # Keyservers fail fairly regularly with timeouts. Having three servers should be enough of a redundancy to prevent this occuring frequently
   && (gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-key "$LEIN_GPG_KEY" || \
       gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-key "$LEIN_GPG_KEY" || \
       gpg --keyserver hkp://pgp.mit.edu:80 --recv-key "$LEIN_GPG_KEY") \
