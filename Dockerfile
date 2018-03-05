@@ -101,7 +101,7 @@ RUN pip install --upgrade \
     awscli \
     awsebcli
 
-#-- Install Circle-CI Tools
+#-- Install CircleCI Tools
 RUN git clone -b master https://github.com/jesims/circleci-tools.git \
   && cd circleci-tools \
   && git pull \
