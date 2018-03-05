@@ -1,11 +1,12 @@
 # JESI.IO
-## Build-Bus
+[![Docker Automated build](https://img.shields.io/docker/automated/jesiio/build-bus.svg)](https://hub.docker.com/r/jesiio/build-bus/)
+[![Docker Build Status](https://img.shields.io/docker/build/jesiio/build-bus.svg)](https://hub.docker.com/r/jesiio/build-bus/builds/)
 
+## Build-Bus
 A single docker container for building and testing all of our projects; and for cancelling redundant builds on CircleCI 
 using [https://github.com/jesims/circleci-tools](https://github.com/jesims/circleci-tools).
 
 ## Docker Hub
-
 This container is automatically built and made available by DockerHub at [https://hub.docker.com/r/jesio/build-bus](https://hub.docker.com/r/jesiio/build-bus) and can be
 referenced in the CircleCI `config.yml` by using `jesiio/build-bus:latest`. For example:
 
@@ -33,19 +34,7 @@ jobs:
 ```
 
 ### Manual Build and Deploy
-
 A manual build and deploy (to DockerHub) can be run by invoking `./deploy.sh`
 
 ## Testing
-
 To ensure the build runs, invoke the provide `test.sh` script. 
-
-## Contains
-
-* Node.js
-* Clojure and Clojurescript
-* Maven
-* Leiningen
-* PhantomJS
-* AWS CLI/AWS EB CLI
-
