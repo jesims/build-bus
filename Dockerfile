@@ -24,8 +24,8 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	openssh \
 	openssl \
 	postgresql \
-	python3 \
 	py3-pip \
+	python3 \
 	rsync \
 	ruby \
 	ruby-bundler \
