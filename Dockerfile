@@ -97,6 +97,8 @@ RUN gem install \
     bundler
 
 #-- Typical Python Tools
+RUN ln -s /usr/bin/python3 /usr/bin/python \
+  && ln -s /usr/bin/pip3 /usr/bin/pip 
 RUN pip install --upgrade \
     awscli \
     awsebcli
@@ -108,4 +110,3 @@ RUN git clone -b master https://github.com/jesims/circleci-tools.git \
   && chmod +x ./cancel-redundant-builds.sh
 ENV PATH=$PATH:/tmp/circleci-tools/
 RUN node -v > .node_version
-RUN python --version
