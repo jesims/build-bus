@@ -111,3 +111,9 @@ RUN git clone -b master https://github.com/jesims/circleci-tools.git \
   && chmod +x ./cancel-redundant-builds.sh
 ENV PATH=$PATH:/tmp/circleci-tools/
 RUN node -v > .node_version
+
+#-- Install gmailer-cli Tools
+RUN git clone -b master https://github.com/ammgws/gmailer_oauth.git \
+  && cd gmailer_oauth \
+  && git pull \
+  && pip install -r requirements.txt
