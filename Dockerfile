@@ -15,6 +15,7 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	ca-certificates \
 	curl \
 	docker \
+	file \
 	fontconfig \
 	git \
 	gnupg \
