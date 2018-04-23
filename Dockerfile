@@ -20,6 +20,7 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	git \
 	gnupg \
 	jq \
+	ncurses \
 	nodejs-npm \
 	openjdk8 \
 	openssh \
