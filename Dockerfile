@@ -83,11 +83,6 @@ ENV LEIN_ROOT 1
 RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.9.0"]])' > project.clj \
   && lein deps && rm project.clj
 
-#--- PhantomJS
-# Refer: https://hub.docker.com/r/fgrehm/phantomjs2/builds/bh7pii47dsynpsbhtwd38nk/
-RUN curl -Ls https://github.com/arobson/docker-phantomjs2/releases/download/v2.1.1-20160523/dockerized-phantomjs.tar.gz | tar xz -C /
-RUN ln -s /usr/local/bin/phantomjs /usr/bin/phantomjs
-
 #--- Typical Node Tools
 RUN npm install --global --unsafe-perm \
 	cljs \
