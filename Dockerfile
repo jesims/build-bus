@@ -64,9 +64,9 @@ RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.9.0"]])' >
 
 #--- Typical Node Tools
 RUN npm install --global --unsafe-perm \
-	gulp-cli \
-#	lumo-cljs \
+	lumo-cljs \
 	cljs \
+	gulp-cli \
 	wait-on
 
 #--- Typical Ruby Tools
