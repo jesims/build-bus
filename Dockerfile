@@ -2,8 +2,6 @@ FROM alpine:latest
 
 # ENV CLJ_TOOLS_VERSION=1.9.0.348
 ENV LEIN_VERSION=2.8.1
-ENV LEIN_INSTALL=/usr/local/bin/
-ENV LEIN_GPG_KEY=2B72BF956E23DE5E830D50F6002AF007D1A7CC18
 ENV MAVEN_VERSION=3.5.2
 ENV MAVEN_HOME=/usr/lib/mvn
 
@@ -54,29 +52,10 @@ RUN wget http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/ap
 #  && chmod +x linux-install-$CLJ_TOOLS_VERSION.sh \
 #  ./linux-install-$CLJ_TOOLS_VERSION.sh
 
-#--- Leiningen (from  https://github.com/Quantisan/docker-clojure/blob/master/alpine/lein/Dockerfile)
-
-# Download the whole repo as an archive
-RUN mkdir -p $LEIN_INSTALL \
-  && wget -q https://raw.githubusercontent.com/technomancy/leiningen/$LEIN_VERSION/bin/lein-pkg \
-  && echo "Comparing lein-pkg checksum ..." \
-  && echo "019faa5f91a463bf9742c3634ee32fb3db8c47f0 *lein-pkg" | sha1sum -c - \
-  && mv lein-pkg $LEIN_INSTALL/lein \
-  && chmod 0755 $LEIN_INSTALL/lein \
-  && echo "Fetching lein standalone zip ..." \
-  && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip \
-  && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip.asc \
-  # Keyservers fail fairly regularly with timeouts. Having three servers should be enough of a redundancy to prevent this occuring frequently
-  && (gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-key "$LEIN_GPG_KEY" || \
-      gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-key "$LEIN_GPG_KEY" || \
-      gpg --keyserver hkp://pgp.mit.edu:80 --recv-key "$LEIN_GPG_KEY") \
-  && echo "Verifying Jar file signature ..." \
-  && gpg --verify leiningen-$LEIN_VERSION-standalone.zip.asc \
-  && rm leiningen-$LEIN_VERSION-standalone.zip.asc \
-  && mkdir -p /usr/share/java \
-  && mv leiningen-$LEIN_VERSION-standalone.zip /usr/share/java/leiningen-$LEIN_VERSION-standalone.jar
-
-ENV PATH=$PATH:$LEIN_INSTALL
+#--- Leiningen (from https://github.com/sgerrand/alpine-pkg-leiningen)
+RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/sgerrand/alpine-pkg-leiningen/master/sgerrand.rsa.pub \
+	&& wget https://github.com/sgerrand/alpine-pkg-leiningen/releases/download/${LEIN_VERSION}-r0/leiningen-${LEIN_VERSION}-r0.apk \
+	&& apk add leiningen-${LEIN_VERSION}-r0.apk
 ENV LEIN_ROOT 1
 
 # Install clojure 1.9.0 so users don't have to download it every time
@@ -85,9 +64,9 @@ RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.9.0"]])' >
 
 #--- Typical Node Tools
 RUN npm install --global --unsafe-perm \
-	cljs \
 	gulp-cli \
-	lumo-cljs \
+#	lumo-cljs \
+	cljs \
 	wait-on
 
 #--- Typical Ruby Tools
@@ -97,7 +76,7 @@ RUN gem install \
 #-- Typical Python Tools
 RUN ln -s /usr/bin/python3 /usr/bin/python \
   && ln -s /usr/bin/pip3 /usr/bin/pip
-RUN pip install --upgrade \
+RUN pip3 install --upgrade \
     awscli \
     awsebcli
 

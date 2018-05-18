@@ -1,2 +1,6 @@
 #!/usr/bin/env bash
-docker build . -t jesiio/build-bus:test
+tag=jesiio/build-bus:test
+docker build . -t ${tag}
+if [ $? -ne 0 ];then
+	docker build --no-cache . -t ${tag}
+fi
