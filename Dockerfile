@@ -62,12 +62,18 @@ ENV LEIN_ROOT 1
 RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.9.0"]])' > project.clj \
   && lein deps && rm project.clj
 
+#--- PhantomJS
+# Refer: https://hub.docker.com/r/fgrehm/phantomjs2/builds/bh7pii47dsynpsbhtwd38nk/
+RUN curl -Ls https://github.com/arobson/docker-phantomjs2/releases/download/v2.1.1-20160523/dockerized-phantomjs.tar.gz | tar xz -C /
+RUN ln -s /usr/local/bin/phantomjs /usr/bin/phantomjs
+
 #--- Typical Node Tools
 RUN npm install --global --unsafe-perm \
-	lumo-cljs \
-	cljs \
-	gulp-cli \
-	wait-on
+		lumo-cljs \
+		progress \
+		cljs \
+		gulp-cli \
+		wait-on
 
 #--- Typical Ruby Tools
 RUN gem install \
@@ -77,6 +83,8 @@ RUN gem install \
 RUN ln -s /usr/bin/python3 /usr/bin/python \
   && ln -s /usr/bin/pip3 /usr/bin/pip
 RUN pip3 install --upgrade \
+		pip \
+		colorama==0.3.7 \
     awscli \
     awsebcli
 
