@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM node:10-alpine
 
 # ENV CLJ_TOOLS_VERSION=1.9.0.348
 ENV LEIN_VERSION=2.8.1
@@ -19,7 +19,6 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	gnupg \
 	jq \
 	ncurses \
-	nodejs-npm \
 	openjdk8 \
 	openssh \
 	openssl \
