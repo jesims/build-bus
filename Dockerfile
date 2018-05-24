@@ -15,7 +15,7 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	bash \
 	build-base \
 	ca-certificates \
-	chromium
+	chromium \
 	curl \
 	docker \
 	file \
