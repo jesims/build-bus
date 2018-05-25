@@ -7,10 +7,14 @@ ENV MAVEN_HOME=/usr/lib/mvn
 
 WORKDIR /tmp
 
+RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories \
+	&& echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories
+
 RUN apk add --verbose --update --upgrade --no-cache \
 	bash \
 	build-base \
 	ca-certificates \
+	chromium@edge \
 	curl \
 	docker \
 	file \
@@ -19,6 +23,7 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	gnupg \
 	jq \
 	ncurses \
+	nss@edge \
 	openjdk8 \
 	openssh \
 	openssl \
@@ -37,13 +42,21 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	wget \
 	zip
 
+#--- Chromium (from https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-on-alpine)
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+
+RUN addgroup -S pptruser \
+	&& adduser -S -g pptruser pptruser \
+	&& mkdir -p /home/pptruser/Downloads \
+	&& chown -R pptruser:pptruser /home/pptruser
+
 #--- Maven (from https://github.com/Zenika/alpine-maven/blob/master/jdk8/Dockerfile)
 ENV PATH=$PATH:$MAVEN_HOME/bin
 
-RUN wget http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz && \
-	tar -zxvf apache-maven-$MAVEN_VERSION-bin.tar.gz && \
-	rm apache-maven-$MAVEN_VERSION-bin.tar.gz && \
-	mv apache-maven-$MAVEN_VERSION /usr/lib/mvn
+RUN wget http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
+	&& tar -zxvf apache-maven-$MAVEN_VERSION-bin.tar.gz \
+	&& rm apache-maven-$MAVEN_VERSION-bin.tar.gz \
+	&& mv apache-maven-$MAVEN_VERSION /usr/lib/mvn
 
 # Todo: Uncomment when clj tools required (will need to install rlwrap)
 #--- Clojure-Tools
@@ -59,15 +72,16 @@ ENV LEIN_ROOT 1
 
 # Install clojure 1.9.0 so users don't have to download it every time
 RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.9.0"]])' > project.clj \
-	&& lein deps && rm project.clj
+	&& lein deps \
+	&& rm project.clj
 
 #--- Typical Node Tools
 RUN npm install --global --unsafe-perm \
-		lumo-cljs \
-		progress \
-		cljs \
-		gulp-cli \
-		wait-on
+	lumo-cljs \
+	progress \
+	cljs \
+	gulp-cli \
+	wait-on
 
 #--- Typical Ruby Tools
 RUN gem install \
@@ -89,3 +103,5 @@ RUN git clone -b master https://github.com/jesims/circleci-tools.git \
 	&& chmod +x ./cancel-redundant-builds.sh
 ENV PATH=$PATH:/tmp/circleci-tools/
 RUN node -v > .node_version
+
+USER pptruser
