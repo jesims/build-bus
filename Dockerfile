@@ -7,30 +7,21 @@ ENV MAVEN_HOME=/usr/lib/mvn
 
 WORKDIR /tmp
 
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-	&& echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
-	&& echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-
 RUN apk add --verbose --update --upgrade --no-cache \
 	bash \
 	build-base \
 	ca-certificates \
-	chromium \
 	curl \
 	docker \
 	file \
 	fontconfig \
-	gifsicle \
 	git \
 	gnupg \
 	jq \
-	libjpeg-turbo-utils \
 	ncurses \
 	openjdk8 \
 	openssh \
 	openssl \
-	optipng \
-	pngquant \
 	postgresql \
 	py3-pip \
 	python3 \
@@ -42,15 +33,9 @@ RUN apk add --verbose --update --upgrade --no-cache \
 	ruby-rdoc \
 	tar \
 	the_silver_searcher \
-	ttf-opensans \
-	udev \
 	util-linux \
 	wget \
 	zip
-
-#--- Chromium (from https://hub.docker.com/r/rastasheep/alpine-node-chromium/~/dockerfile)
-ENV CHROME_BIN /usr/bin/chromium-browser
-ENV LIGHTHOUSE_CHROMIUM_PATH /usr/bin/chromium-browser
 
 #--- Maven (from https://github.com/Zenika/alpine-maven/blob/master/jdk8/Dockerfile)
 ENV PATH=$PATH:$MAVEN_HOME/bin
