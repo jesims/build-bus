@@ -6,7 +6,7 @@ ENV MAVEN_VERSION=3.5.2
 ENV MAVEN_HOME=/usr/lib/mvn
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV LEIN_ROOT=1
-ENV JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+ENV JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAM=3g"
 
 WORKDIR /tmp
 
