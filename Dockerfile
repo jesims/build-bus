@@ -59,6 +59,7 @@ RUN npm install --global --unsafe-perm \
 	lumo-cljs \
 	progress \
 	cljs \
+	dry-dry \
 	gulp-cli \
 	http-server \
 	wait-on
