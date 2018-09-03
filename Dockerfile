@@ -56,12 +56,12 @@ RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/
 
 #--- Typical Node Tools
 RUN npm install --global --unsafe-perm \
-	lumo-cljs \
-	progress \
 	cljs \
 	dry-dry \
 	gulp-cli \
-	http-server \
+	local-web-server \
+	lumo-cljs \
+	progress \
 	wait-on
 
 #--- Typical Ruby Tools
