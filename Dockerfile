@@ -72,6 +72,7 @@ RUN gem install \
 RUN ln -s /usr/bin/python3 /usr/bin/python \
   && ln -s /usr/bin/pip3 /usr/bin/pip
 RUN pip3 install --upgrade pip && pip3 install --upgrade \
+	urllib3==1.22 \
 	awscli \
 	awsebcli \
 	&& rm -rf ~/.cache/pip
