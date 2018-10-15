@@ -85,6 +85,9 @@ RUN git clone -b master https://github.com/jesims/circleci-tools.git \
 ENV PATH=$PATH:/tmp/circleci-tools/
 RUN node -v > .node_version
 
-CMD ["bash"]
+#Bug in npm on AWS's Hyperv virtualization on M5 instances https://github.com/nodejs/docker-node/issues/813
+CMD npm config set unsafe-perm true
 
 #TODO don't run as root
+
+CMD ["bash"]
