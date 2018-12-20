@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM node:11-alpine
 
 #ENV CLJ_TOOLS_VERSION=1.9.0.381
 ENV LEIN_VERSION=2.8.1
