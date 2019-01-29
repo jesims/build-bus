@@ -15,6 +15,7 @@ RUN apk update --verbose && apk upgrade --verbose && apk add --verbose --upgrade
 	build-base \
 	ca-certificates \
 	chromium \
+	coreutils \
 	curl \
 	docker \
 	file \
