@@ -1,4 +1,4 @@
-FROM node:11-alpine
+FROM node:12-alpine
 
 #ENV CLJ_TOOLS_VERSION=1.9.0.381
 ENV LEIN_VERSION=2.9.1
@@ -74,17 +74,12 @@ RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.10.0"]])' 
 
 #--- Typical Node Tools
 RUN npm install --global --unsafe-perm \
-	cljs \
 	dry-dry \
 	gulp-cli \
 	local-web-server \
 	lumo-cljs \
 	progress \
 	wait-on
-
-#--- Typical Ruby Tools
-RUN gem install \
-	bundler
 
 #-- Typical Python Tools
 RUN ln -s /usr/bin/python3 /usr/bin/python \
