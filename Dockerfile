@@ -5,6 +5,8 @@ ENV LEIN_VERSION=2.9.1
 ENV LEIN_INSTALL=/usr/local/bin/
 ENV MAVEN_VERSION=3.5.4
 ENV MAVEN_HOME=/usr/lib/mvn
+ENV BOOT_VERSION=2.8.3
+ENV BOOT_INSTALL=/usr/local/bin/
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV LEIN_ROOT=1
 ENV DEBUG=1
@@ -66,6 +68,19 @@ RUN mkdir -p $LEIN_INSTALL \
 
 RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.10.0"]])' > project.clj && lein deps && rm project.clj
 
+#--- Boot
+# https://github.com/Quantisan/docker-clojure/blob/master/target/openjdk-8/debian/boot/Dockerfile
+RUN mkdir -p $BOOT_INSTALL \
+  && wget -q https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh \
+  && echo "Comparing installer checksum..." \
+  && echo "f717ef381f2863a4cad47bf0dcc61e923b3d2afb *boot.sh" | sha1sum -c - \
+  && mv boot.sh $BOOT_INSTALL/boot \
+  && chmod 0755 $BOOT_INSTALL/boot
+
+ENV PATH=$PATH:$BOOT_INSTALL
+ENV BOOT_AS_ROOT=yes
+RUN boot --version
+
 #TODO: Uncomment when clj tools required (will need to install rlwrap)
 #--- Clojure-Tools
 #RUN curl -O https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION}.sh \
@@ -85,6 +100,7 @@ RUN npm install --global --unsafe-perm \
 RUN ln -s /usr/bin/python3 /usr/bin/python \
   && ln -s /usr/bin/pip3 /usr/bin/pip
 RUN pip3 install --upgrade pip && pip3 install --upgrade \
+	PyYAML==3.10 \
 	awscli \
 	awsebcli \
 	&& rm -rf ~/.cache/pip
