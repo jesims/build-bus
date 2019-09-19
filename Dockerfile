@@ -1,6 +1,6 @@
 FROM node:12-alpine
 
-#ENV CLJ_TOOLS_VERSION=1.9.0.381
+ENV CLJ_TOOLS_VERSION=1.10.1.469
 ENV LEIN_VERSION=2.9.1
 ENV LEIN_INSTALL=/usr/local/bin/
 ENV MAVEN_VERSION=3.5.4
@@ -81,11 +81,11 @@ ENV PATH=$PATH:$BOOT_INSTALL
 ENV BOOT_AS_ROOT=yes
 RUN boot --version
 
-#TODO: Uncomment when clj tools required (will need to install rlwrap)
 #--- Clojure-Tools
-#RUN curl -O https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION}.sh \
-#	&& chmod +x linux-install-${CLJ_TOOLS_VERSION}.sh \
-#	&& ./linux-install-${CLJ_TOOLS_VERSION}.sh
+# https://clojure.org/guides/getting_started#_installation_on_linux
+RUN curl -O https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION}.sh \
+	&& chmod +x linux-install-${CLJ_TOOLS_VERSION}.sh \
+	&& ./linux-install-${CLJ_TOOLS_VERSION}.sh
 
 #--- Typical Node Tools
 RUN npm install --global --unsafe-perm \
