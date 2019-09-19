@@ -86,6 +86,7 @@ RUN boot --version
 RUN curl -O https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION}.sh \
 	&& chmod +x linux-install-${CLJ_TOOLS_VERSION}.sh \
 	&& ./linux-install-${CLJ_TOOLS_VERSION}.sh
+	&& clojure -e '(println "IT WORKS!")'
 
 #--- Typical Node Tools
 RUN npm install --global --unsafe-perm \
