@@ -14,39 +14,50 @@ ENV _JAVA_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitFor
 
 WORKDIR /tmp
 
-RUN apk update --verbose && apk upgrade --verbose && apk add --verbose --upgrade \
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
+  && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
+  && apk --no-cache  update \
+  && apk --no-cache  upgrade
+
+RUN apk add --verbose --no-cache --upgrade --virtual \
+	.build-deps \
 	bash \
 	build-base \
 	ca-certificates \
 	chromium \
+	chromium-chromedriver \
 	coreutils \
 	curl \
 	docker \
 	file \
 	fontconfig \
+	gifsicle \
 	git \
 	gnupg \
 	jq \
+	libjpeg-turbo-utils \
 	maven \
 	ncurses \
 	openjdk8 \
 	openssh \
 	openssl \
+	optipng \
+	pngquant \
 	postgresql \
 	py3-pip \
 	python3 \
 	rsync \
-	ruby \
-	ruby-bundler \
-	ruby-dev \
-	ruby-irb \
-	ruby-rdoc \
 	tar \
 	the_silver_searcher \
+	udev \
+	ttf-opensans \
 	util-linux \
 	wget \
 	zip \
 	&& rm -rf /var/cache/apk
+
+RUN chromedriver --version && chromium-browser --version
 
 #--- Leiningen
 # https://github.com/docker-library/repo-info/blob/master/repos/clojure/remote/lein-2.9.1-alpine.md
