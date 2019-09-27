@@ -90,7 +90,7 @@ RUN mkdir -p $BOOT_INSTALL \
 
 ENV PATH=$PATH:$BOOT_INSTALL
 ENV BOOT_AS_ROOT=yes
-RUN boot --version
+RUN boot --update && boot --version | sed 's/BOOT_CLOJURE_VERSION.*/BOOT_CLOJURE_VERSION=1.10.1/' > ~/.boot/boot.properties
 
 #--- Clojure-Tools
 # https://clojure.org/guides/getting_started#_installation_on_linux
