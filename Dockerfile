@@ -1,7 +1,7 @@
 FROM node:12-alpine
 
 ENV AWS_CLI_VERSION=1.16.266
-ENV CLJOG_VERSION=0.1.1
+ENV CLJOG_VERSION=0.2.0
 ENV CLJ_TOOLS_VERSION=1.10.1.469
 ENV LEIN_VERSION=2.9.1
 ENV LEIN_INSTALL=/usr/local/bin/
@@ -133,10 +133,10 @@ RUN node -v > .node_version
 #-- Install cljog
 RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
   && chmod u+x cljog \
-  && mv cljog /usr/bin/ \
+  && mv cljog /usr/local/bin/ \
   && wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj \
   && chmod u+x echo.clj \
-  && ./echo.clj
+  && ./echo.clj && rm echo.clj
 
 #Bug in npm on AWS's Hyperv virtualization on M5 instances https://github.com/nodejs/docker-node/issues/813
 CMD npm config set unsafe-perm true
