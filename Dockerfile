@@ -1,5 +1,7 @@
 FROM node:12-alpine
 
+ENV AWS_CLI_VERSION=1.16.266
+ENV CLJOG_VERSION=0.2.0
 ENV CLJ_TOOLS_VERSION=1.10.1.469
 ENV LEIN_VERSION=2.9.1
 ENV LEIN_INSTALL=/usr/local/bin/
@@ -111,11 +113,13 @@ RUN npm install --global --unsafe-perm \
 #-- Typical Python Tools
 RUN ln -s /usr/bin/python3 /usr/bin/python \
   && ln -s /usr/bin/pip3 /usr/bin/pip
-RUN pip3 install --upgrade pip && pip3 install --upgrade \
-	PyYAML==3.10 \
-	awscli \
-	awsebcli \
-	&& rm -rf ~/.cache/pip
+RUN pip3 install --upgrade pip setuptools && pip3 --no-cache-dir install \
+	'PyYAML<=3.13,>=3.10' \
+	'botocore<1.13,>=1.12.29' \
+	'colorama<0.4.0,>=0.3.9' \
+	'urllib3<1.25,>=1.24.1' \
+	awscli==${AWS_CLI_VERSION} \
+	awsebcli
 RUN aws --version && eb --version
 
 #-- Install CircleCI Tools
@@ -125,6 +129,14 @@ RUN git clone -b master https://github.com/jesims/circleci-tools.git \
 	&& chmod +x ./cancel-redundant-builds.sh
 ENV PATH=$PATH:/tmp/circleci-tools/
 RUN node -v > .node_version
+
+#-- Install cljog
+RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
+  && chmod u+x cljog \
+  && mv cljog /usr/local/bin/ \
+  && wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj \
+  && chmod u+x echo.clj \
+  && ./echo.clj && rm echo.clj
 
 #Bug in npm on AWS's Hyperv virtualization on M5 instances https://github.com/nodejs/docker-node/issues/813
 CMD npm config set unsafe-perm true
