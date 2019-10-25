@@ -126,6 +126,14 @@ RUN git clone -b master https://github.com/jesims/circleci-tools.git \
 ENV PATH=$PATH:/tmp/circleci-tools/
 RUN node -v > .node_version
 
+#-- Install cljog
+RUN wget https://raw.githubusercontent.com/axrs/cljog/0.1.1/cljog \
+  && chmod u+x cljog \
+  && mv cljog /usr/bin/ \
+  && wget https://raw.githubusercontent.com/axrs/cljog/master/example-scripts/echo.clj \
+  && chmod u+x echo.clj \
+  && ./echo.clj
+
 #Bug in npm on AWS's Hyperv virtualization on M5 instances https://github.com/nodejs/docker-node/issues/813
 CMD npm config set unsafe-perm true
 
