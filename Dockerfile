@@ -108,6 +108,7 @@ RUN npm install --global --unsafe-perm \
 	local-web-server \
 	lumo-cljs \
 	progress \
+	remark-cli \
 	wait-on
 
 #-- Typical Python Tools
