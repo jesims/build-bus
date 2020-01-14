@@ -1,7 +1,7 @@
 FROM node:13-alpine
 
 ENV \
-AWS_CLI_VERSION=1.17.0 \
+AWS_CLI_VERSION=1.17.1 \
 BOOT_INSTALL=/usr/local/bin/ \
 BOOT_VERSION=2.8.3 \
 CLJOG_VERSION=0.2.1 \
@@ -17,7 +17,7 @@ _JAVA_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
 WORKDIR /tmp
 
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
  && apk --no-cache upgrade \
  && apk add --verbose --no-cache --upgrade --virtual .build-bus \
     bash \
@@ -28,6 +28,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repos
     coreutils \
     curl \
     docker \
+    docker-compose \
     file \
     fontconfig \
     gifsicle \
@@ -115,13 +116,11 @@ RUN npm install --global npm \
 #-- Typical Python Tools
 RUN ln -s /usr/bin/python3 /usr/bin/python \
  && ln -s /usr/bin/pip3 /usr/bin/pip \
- && pip3 install --upgrade pip setuptools \
- && pip3 --no-cache-dir install \
-    'PyYAML<=3.13,>=3.10' \
-    'botocore<1.13,>=1.12.29' \
+ && pip3 --no-cache-dir install --upgrade pip setuptools \
+ && pip3 --no-cache-dir install  \
+    awscli==${AWS_CLI_VERSION} \
     'colorama<0.4.0,>=0.3.9' \
     'urllib3<1.25,>=1.24.1' \
-    awscli==${AWS_CLI_VERSION} \
  && aws --version
 
 #-- Install CircleCI Tools
