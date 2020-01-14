@@ -133,7 +133,7 @@ RUN node -v > .node_version
 
 #-- Install cljog
 RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
- && chmod u+x cljog \
+ && chmod ua+x cljog \
  && mv cljog /usr/local/bin/ \
  && wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj \
  && chmod u+x echo.clj \
