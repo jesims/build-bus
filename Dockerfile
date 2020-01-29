@@ -18,6 +18,7 @@ _JAVA_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 WORKDIR /tmp
 
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
+ && echo "http://dl-cdn.alpinelinux.org/alpine/v3.9/community" >> /etc/apk/repositories \
  && apk --no-cache upgrade \
  && apk add --verbose --no-cache --upgrade --virtual .build-bus \
     bash \
@@ -49,6 +50,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/
     rsync \
     shellcheck \
     tar \
+    'terraform<0.12' \
     the_silver_searcher \
     ttf-opensans \
     udev \
