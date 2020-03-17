@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:12.4.0-alpine
 
 ENV \
 AWS_CLI_VERSION=1.17.1 \
@@ -9,7 +9,7 @@ CLJ_TOOLS_VERSION=1.10.1.492 \
 DEBUG=1 \
 LEIN_INSTALL=/usr/local/bin/ \
 LEIN_ROOT=1 \
-LEIN_VERSION=2.9.1 \
+LEIN_VERSION=2.9.2 \
 MAVEN_HOME=/usr/lib/mvn \
 MAVEN_VERSION=3.5.4 \
 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
@@ -18,6 +18,7 @@ _JAVA_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 WORKDIR /tmp
 
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
+ && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
  && echo "http://dl-cdn.alpinelinux.org/alpine/v3.9/community" >> /etc/apk/repositories \
  && apk --no-cache upgrade \
  && apk add --verbose --no-cache --upgrade --virtual .build-bus \
@@ -66,16 +67,11 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/
 RUN mkdir -p $LEIN_INSTALL \
  && wget -q https://raw.githubusercontent.com/technomancy/leiningen/$LEIN_VERSION/bin/lein-pkg \
  && echo 'Comparing lein-pkg checksum ...' \
- && sha1sum lein-pkg \
- && echo '93be2c23ab4ff2fc4fcf531d7510ca4069b8d24a *lein-pkg' | sha1sum -c - \
+ && sha256sum lein-pkg \
+ && echo '36f879a26442648ec31cfa990487cbd337a5ff3b374433a6e5bf393d06597602 *lein-pkg' | sha256sum -c - \
  && mv lein-pkg $LEIN_INSTALL/lein \
  && chmod 0755 $LEIN_INSTALL/lein \
  && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip \
- && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip.asc \
- && gpg --batch --keyserver pool.sks-keyservers.net --recv-key 2B72BF956E23DE5E830D50F6002AF007D1A7CC18 \
- && echo 'Verifying Jar file signature ...' \
- && gpg --verify leiningen-$LEIN_VERSION-standalone.zip.asc \
- && rm leiningen-$LEIN_VERSION-standalone.zip.asc \
  && mkdir -p /usr/share/java \
  && mv leiningen-$LEIN_VERSION-standalone.zip /usr/share/java/leiningen-$LEIN_VERSION-standalone.jar
 
