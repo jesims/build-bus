@@ -30,23 +30,28 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/
     coreutils \
     curl \
     docker \
-    docker-compose \
     file \
     fontconfig \
+    gcc \
     gifsicle \
     git \
     gnupg \
     jq \
+    libc-dev \
+    libffi-dev \
     libjpeg-turbo-utils \
+    make \
     maven \
     ncurses \
     openjdk8 \
     openssh \
     openssl \
+    openssl-dev \
     optipng \
     pngquant \
     postgresql \
     py3-pip \
+    python3-dev \
     python3 \
     rsync \
     shellcheck \
@@ -119,7 +124,9 @@ RUN ln -s /usr/bin/python3 /usr/bin/python \
     awscli==${AWS_CLI_VERSION} \
     'colorama<0.4.0,>=0.3.9' \
     'urllib3<1.25,>=1.24.1' \
- && aws --version
+    docker-compose \
+ && aws --version \
+ && docker-compose --version
 
 #-- Install CircleCI Tools
 RUN git clone -b master https://github.com/jesims/circleci-tools.git \
