@@ -1,4 +1,4 @@
-FROM node:12.4.0-alpine
+FROM node:13.12.0-alpine
 
 ENV \
 AWS_CLI_VERSION=1.17.1 \
