@@ -122,6 +122,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python \
  && pip3 --no-cache-dir install --upgrade pip setuptools \
  && pip3 --no-cache-dir install  \
     awscli==${AWS_CLI_VERSION} \
+    azure-cli \
     'colorama<0.4.0,>=0.3.9' \
     'urllib3<1.25,>=1.24.1' \
     docker-compose \
