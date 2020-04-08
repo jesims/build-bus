@@ -127,6 +127,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python \
     'urllib3<1.25,>=1.24.1' \
     docker-compose \
  && aws --version \
+ && az --version \
  && docker-compose --version
 
 #-- Install CircleCI Tools
