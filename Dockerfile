@@ -1,27 +1,25 @@
 FROM node:12.4.0-alpine
 
-ENV \
-AWS_CLI_VERSION=1.17.1 \
-BOOT_INSTALL=/usr/local/bin/ \
-BOOT_VERSION=2.8.3 \
-CLJOG_VERSION=0.3.2 \
-CLJ_TOOLS_VERSION=1.10.1.492 \
-DEBUG=1 \
-LEIN_INSTALL=/usr/local/bin/ \
-LEIN_ROOT=1 \
-LEIN_VERSION=2.9.2 \
-MAVEN_HOME=/usr/lib/mvn \
-MAVEN_VERSION=3.5.4 \
-PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-_JAVA_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAM=3g"
+ENV AWS_CLI_VERSION=1.18.41 \
+    CLJOG_VERSION=1.0.0 \
+    CLJ_TOOLS_VERSION=1.10.1.536 \
+    DEBUG=1 \
+    LEIN_INSTALL=/usr/local/bin/ \
+    LEIN_ROOT=1 \
+    LEIN_VERSION=2.9.3 \
+    MAVEN_HOME=/usr/lib/mvn \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /tmp
 
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
- && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
- && echo "http://dl-cdn.alpinelinux.org/alpine/v3.9/community" >> /etc/apk/repositories \
- && apk --no-cache upgrade \
- && apk add --verbose --no-cache --upgrade --virtual .build-bus \
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/main" > /etc/apk/repositories \
+ && echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
+ && apk upgrade \
+ #TODO remove specifying respository once openjdk14 is in latest-stable branch
+ && apk add --verbose --repository "http://dl-cdn.alpinelinux.org/alpine/edge/testing" \
+    openjdk14 \
+ && java -version \
+ && apk add --verbose --upgrade \
     bash \
     build-base \
     ca-certificates \
@@ -43,7 +41,6 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/
     make \
     maven \
     ncurses \
-    openjdk8 \
     openssh \
     openssl \
     openssl-dev \
@@ -56,15 +53,18 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/
     rsync \
     shellcheck \
     tar \
-    'terraform<0.12' \
     the_silver_searcher \
     ttf-opensans \
     udev \
     util-linux \
     wget \
     zip \
+ && rm -rf /var/cache/apk \
  && chromedriver --version \
- && chromium-browser --version
+ && chromium-browser --version \
+ && mvn --version \
+ && apk add --verbose --repository "http://dl-cdn.alpinelinux.org/alpine/3.9/community" \
+    'terraform<0.12'
 
 #--- Leiningen
 # https://hub.docker.com/_/clojure
@@ -83,20 +83,6 @@ RUN mkdir -p $LEIN_INSTALL \
 RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.10.1"]])' > project.clj \
  && lein deps \
  && rm project.clj
-
-#--- Boot
-# https://github.com/Quantisan/docker-clojure/blob/master/target/openjdk-8/debian/boot/Dockerfile
-RUN mkdir -p $BOOT_INSTALL \
- && wget -q https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh \
- && echo "Comparing installer checksum..." \
- && echo "f717ef381f2863a4cad47bf0dcc61e923b3d2afb *boot.sh" | sha1sum -c - \
- && mv boot.sh $BOOT_INSTALL/boot \
- && chmod 0755 $BOOT_INSTALL/boot
-
-ENV PATH=$PATH:$BOOT_INSTALL
-ENV BOOT_AS_ROOT=yes
-RUN boot --update \
- && boot --version | sed 's/BOOT_CLOJURE_VERSION.*/BOOT_CLOJURE_VERSION=1.10.1/' > ~/.boot/boot.properties
 
 #--- Clojure-Tools
 # https://clojure.org/guides/getting_started#_installation_on_linux
