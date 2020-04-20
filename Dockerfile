@@ -1,28 +1,29 @@
 FROM node:12.4.0-alpine
 
-ENV AWS_CLI_VERSION=1.18.41 \
-    CLJOG_VERSION=1.0.0 \
-    CLJ_TOOLS_VERSION=1.10.1.536 \
-    DEBUG=1 \
-    LEIN_INSTALL=/usr/local/bin/ \
-    LEIN_ROOT=1 \
-    LEIN_VERSION=2.9.3 \
-    MAVEN_HOME=/usr/lib/mvn \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV AWS_CLI_VERSION=1.18.41
+ENV CLJOG_VERSION=1.0.0
+ENV CLOJURE_VERSION=1.10.1
+ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.536
+ENV DEBUG=1
+ENV MAVEN_HOME=/usr/lib/mvn
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /tmp
 
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/main" > /etc/apk/repositories \
- && echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
- && apk upgrade \
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/latest-stable/main' > /etc/apk/repositories \
+ && echo 'http://dl-cdn.alpinelinux.org/alpine/latest-stable/community' >> /etc/apk/repositories \
+ && apk update --verbose \
+ && apk upgrade --verbose \
+ #TODO remove specifying respository once we're using terraform 0.12 JESI-3036
+ && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
+    'terraform<0.12' \
  #TODO remove specifying respository once openjdk14 is in latest-stable branch
- && apk add --verbose --repository "http://dl-cdn.alpinelinux.org/alpine/edge/testing" \
+ && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' \
     openjdk14 \
- && java -version \
- && apk add --verbose --upgrade \
+ #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
+ && apk add --verbose \
     bash \
     build-base \
-    ca-certificates \
     chromium \
     chromium-chromedriver \
     coreutils \
@@ -62,25 +63,22 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/main" > /etc/apk/re
  && rm -rf /var/cache/apk \
  && chromedriver --version \
  && chromium-browser --version \
- && mvn --version \
- && apk add --verbose --repository "http://dl-cdn.alpinelinux.org/alpine/3.9/community" \
-    'terraform<0.12'
+ && java -version \
+ && mvn --version
 
 #--- Leiningen
-# https://hub.docker.com/_/clojure
-# https://github.com/Quantisan/docker-clojure/blob/master/target/openjdk-8-stretch/lein/Dockerfile
-RUN mkdir -p $LEIN_INSTALL \
- && wget -q https://raw.githubusercontent.com/technomancy/leiningen/$LEIN_VERSION/bin/lein-pkg \
- && echo 'Comparing lein-pkg checksum ...' \
- && sha256sum lein-pkg \
- && echo '36f879a26442648ec31cfa990487cbd337a5ff3b374433a6e5bf393d06597602 *lein-pkg' | sha256sum -c - \
- && mv lein-pkg $LEIN_INSTALL/lein \
- && chmod 0755 $LEIN_INSTALL/lein \
- && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip \
- && mkdir -p /usr/share/java \
- && mv leiningen-$LEIN_VERSION-standalone.zip /usr/share/java/leiningen-$LEIN_VERSION-standalone.jar
+# Based on https://github.com/juxt/docker/blob/master/alpine-clojure/Dockerfile
+ENV LEIN_INSTALL=/usr/local/bin/lein \
+    LEIN_ROOT=1
 
-RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.10.1"]])' > project.clj \
+RUN apk add --no-cache --virtual .lein ca-certificates \
+ && wget 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein' \
+    -O $LEIN_INSTALL \
+ && chmod 0755 $LEIN_INSTALL \
+ && apk del .lein \
+ && lein --version
+
+RUN echo "(defproject dummy \"\" :dependencies [[org.clojure/clojure \"$CLOJURE_VERSION\"]])" > project.clj \
  && lein deps \
  && rm project.clj
 
@@ -101,17 +99,19 @@ RUN npm install --global npm \
     progress \
     remark-cli \
     wait-on
+ && rm $HOME/.npm
 
 #-- Typical Python Tools
 RUN ln -s /usr/bin/python3 /usr/bin/python \
  && ln -s /usr/bin/pip3 /usr/bin/pip \
- && pip3 --no-cache-dir install --upgrade pip setuptools \
- && pip3 --no-cache-dir install  \
+ && pip3 install --upgrade pip setuptools \
+ && pip3 install \
     awscli==${AWS_CLI_VERSION} \
     azure-cli \
     'colorama<0.4.0,>=0.3.9' \
     'urllib3<1.25,>=1.24.1' \
     docker-compose \
+ && rm -rf $HOME/.cache
  && aws --version \
  && az --version \
  && docker-compose --version
@@ -126,12 +126,18 @@ RUN node -v > .node_version
 
 #-- Install cljog
 RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
- && chmod ua+x cljog \
- && mv cljog /usr/local/bin/ \
+    -O /usr/local/bin/cljog
+ && chmod ua+x /usr/local/bin/cljog \
  && wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj \
  && chmod u+x echo.clj \
  && ./echo.clj \
  && rm echo.clj
+
+#-- Cleanup
+RUN rm -rf \
+    /tmp/ \
+    /var/cache/apk \
+    $HOME.cache
 
 #Bug in npm on AWS's Hyperv virtualization on M5 instances https://github.com/nodejs/docker-node/issues/813
 CMD npm config set unsafe-perm true
