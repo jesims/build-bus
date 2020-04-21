@@ -99,7 +99,7 @@ RUN npm install --global npm \
     progress \
     remark-cli \
     wait-on \
- && rm $HOME/.npm
+ && rm -rf $HOME/.npm
 
 #-- Python
 RUN ln -s /usr/bin/python3 /usr/bin/python \
@@ -137,7 +137,8 @@ RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
 RUN rm -rf \
     /tmp/ \
     /var/cache/apk \
-    $HOME.cache
+    $HOME/.cache \
+    $HOME/.npm
 
 #Bug in npm on AWS's Hyperv virtualization on M5 instances https://github.com/nodejs/docker-node/issues/813
 CMD npm config set unsafe-perm true
