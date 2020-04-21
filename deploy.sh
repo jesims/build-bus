@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-#FIXME restore to 'latest'
-tag='java-14'
+set -e
+tag="${1:-latest}"
 image="jesiio/build-bus:$tag"
-docker build . -t $image --no-cache && docker push $image
+echo "Building $image"
+docker build . -t $image --no-cache
+echo "Deploying $image"
+docker push $image
