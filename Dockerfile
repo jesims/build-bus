@@ -98,7 +98,7 @@ RUN npm install --global npm \
     lumo-cljs \
     progress \
     remark-cli \
-    wait-on
+    wait-on \
  && rm $HOME/.npm
 
 #-- Python
@@ -111,7 +111,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python \
     'colorama<0.4.0,>=0.3.9' \
     'urllib3<1.25,>=1.24.1' \
     docker-compose \
- && rm -rf $HOME/.cache
+ && rm -rf $HOME/.cache \
  && aws --version \
  && az --version \
  && docker-compose --version
@@ -126,7 +126,7 @@ RUN node -v > .node_version
 
 #-- cljog
 RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
-    -O /usr/local/bin/cljog
+    -O /usr/local/bin/cljog \
  && chmod ua+x /usr/local/bin/cljog \
  && wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj \
  && chmod u+x echo.clj \
