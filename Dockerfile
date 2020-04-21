@@ -89,7 +89,7 @@ RUN curl -O https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSI
  && ./linux-install-${CLJ_TOOLS_VERSION}.sh \
  && clojure -e '(println "IT WORKS!")'
 
-#--- Typical Node Tools
+#--- Node
 RUN npm install --global npm \
  && npm install --global \
     dry-dry \
@@ -101,7 +101,7 @@ RUN npm install --global npm \
     wait-on
  && rm $HOME/.npm
 
-#-- Typical Python Tools
+#-- Python
 RUN ln -s /usr/bin/python3 /usr/bin/python \
  && ln -s /usr/bin/pip3 /usr/bin/pip \
  && pip3 install --upgrade pip setuptools \
@@ -116,7 +116,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python \
  && az --version \
  && docker-compose --version
 
-#-- Install CircleCI Tools
+#-- CircleCI Tools
 RUN git clone -b master https://github.com/jesims/circleci-tools.git \
  && cd circleci-tools \
  && git pull \
@@ -124,7 +124,7 @@ RUN git clone -b master https://github.com/jesims/circleci-tools.git \
 ENV PATH=$PATH:/tmp/circleci-tools/
 RUN node -v > .node_version
 
-#-- Install cljog
+#-- cljog
 RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
     -O /usr/local/bin/cljog
  && chmod ua+x /usr/local/bin/cljog \
@@ -133,7 +133,7 @@ RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
  && ./echo.clj \
  && rm echo.clj
 
-#-- Cleanup
+#-- cleanup
 RUN rm -rf \
     /tmp/ \
     /var/cache/apk \
