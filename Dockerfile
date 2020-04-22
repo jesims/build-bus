@@ -131,7 +131,7 @@ RUN chmod -R a+rx /usr/local/bin/
 
 #-- cleanup
 RUN rm -rf \
-    /tmp/ \
+    /tmp/* \
     /var/cache/apk \
     $HOME/.cache \
     $HOME/.npm
