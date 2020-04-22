@@ -74,20 +74,17 @@ ENV LEIN_INSTALL=/usr/local/bin/lein \
 RUN apk add --no-cache --virtual .lein ca-certificates \
  && wget 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein' \
     -O $LEIN_INSTALL \
- && chmod 0755 $LEIN_INSTALL \
+ && chmod +x $LEIN_INSTALL \
  && apk del .lein \
  && lein --version
 
-RUN echo "(defproject dummy \"\" :dependencies [[org.clojure/clojure \"$CLOJURE_VERSION\"]])" > project.clj \
- && lein deps \
- && rm project.clj
-
 #--- Clojure-Tools
 # https://clojure.org/guides/getting_started#_installation_on_linux
-RUN curl -O https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION}.sh \
- && chmod +x linux-install-${CLJ_TOOLS_VERSION}.sh \
+RUN wget "https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION}.sh" \
+ && chmod +x "linux-install-${CLJ_TOOLS_VERSION}.sh" \
  && ./linux-install-${CLJ_TOOLS_VERSION}.sh \
- && clojure -e '(println "IT WORKS!")'
+ && clojure -e '(println "IT WORKS!")' \
+ && rm linux-install-${CLJ_TOOLS_VERSION}.sh
 
 #--- Node
 RUN npm install --global npm \
@@ -117,21 +114,20 @@ RUN ln -s /usr/bin/python3 /usr/bin/python \
  && docker-compose --version
 
 #-- CircleCI Tools
-RUN git clone -b master https://github.com/jesims/circleci-tools.git \
- && cd circleci-tools \
- && git pull \
- && chmod +x ./cancel-redundant-builds.sh
-ENV PATH=$PATH:/tmp/circleci-tools/
-RUN node -v > .node_version
+RUN wget 'https://raw.githubusercontent.com/jesims/circleci-tools/master/cancel-redundant-builds.sh' \
+    -O /usr/local/bin/cancel-redundant-builds.sh
 
 #-- cljog
-RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
+RUN wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog" \
     -O /usr/local/bin/cljog \
- && chmod ua+x /usr/local/bin/cljog \
- && wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj \
- && chmod u+x echo.clj \
+ && chmod +x /usr/local/bin/cljog \
+ && wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj" \
+ && chmod +x echo.clj \
  && ./echo.clj \
  && rm echo.clj
+
+#-- permissions
+RUN chmod -R a+rx /usr/local/bin/
 
 #-- cleanup
 RUN rm -rf \
@@ -141,10 +137,15 @@ RUN rm -rf \
     $HOME/.npm
 
 #Bug in npm on AWS's Hyperv virtualization on M5 instances https://github.com/nodejs/docker-node/issues/813
-CMD npm config set unsafe-perm true
+RUN npm config set unsafe-perm true
 
 USER node
 
 ENV LEIN_ROOT=0
 
-CMD ["bash"]
+WORKDIR /home/node
+
+#-- create .node_version
+RUN node -v > .node_version
+
+ENTRYPOINT ["bash"]
