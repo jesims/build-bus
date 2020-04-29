@@ -1,4 +1,4 @@
-FROM node:12.4.0-alpine
+FROM node:12.16.2-alpine
 
 ENV AWS_CLI_VERSION=1.18.41
 ENV CLJOG_VERSION=1.0.0
@@ -105,8 +105,6 @@ RUN ln -s /usr/bin/python3 /usr/bin/python \
  && pip3 install \
     awscli==${AWS_CLI_VERSION} \
     azure-cli \
-    'colorama<0.4.0,>=0.3.9' \
-    'urllib3<1.25,>=1.24.1' \
     docker-compose \
  && rm -rf $HOME/.cache \
  && aws --version \
