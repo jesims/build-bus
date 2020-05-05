@@ -143,6 +143,6 @@ ENV LEIN_ROOT=0
 
 WORKDIR /home/node
 
-RUN NODE_VERSION=$(node -v)
+RUN export NODE_VERSION=$(node -v)
 
 ENTRYPOINT ["bash"]
