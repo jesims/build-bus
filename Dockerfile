@@ -144,5 +144,6 @@ ENV LEIN_ROOT=0
 WORKDIR /home/node
 
 RUN export NODE_VERSION=$(node -v)
+RUN lein --version
 
 ENTRYPOINT ["bash"]
