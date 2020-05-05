@@ -7,7 +7,7 @@ A single docker container for building and testing all of our projects; and for 
 using [https://github.com/jesims/circleci-tools](https://github.com/jesims/circleci-tools).
 
 ## Docker Hub
-This container is automatically built and made available by DockerHub at [https://hub.docker.com/r/jesio/build-bus](https://hub.docker.com/r/jesiio/build-bus) and can be
+This container is automatically built and made available by DockerHub at <https://hub.docker.com/r/jesiio/build-bus> and can be
 referenced in the CircleCI `config.yml` by using `jesiio/build-bus:latest`. For example:
 
 ```yml

@@ -1,30 +1,29 @@
-FROM node:12.4.0-alpine
+FROM node:12.16.2-alpine
 
-ENV \
-AWS_CLI_VERSION=1.17.1 \
-BOOT_INSTALL=/usr/local/bin/ \
-BOOT_VERSION=2.8.3 \
-CLJOG_VERSION=0.3.2 \
-CLJ_TOOLS_VERSION=1.10.1.492 \
-DEBUG=1 \
-LEIN_INSTALL=/usr/local/bin/ \
-LEIN_ROOT=1 \
-LEIN_VERSION=2.9.2 \
-MAVEN_HOME=/usr/lib/mvn \
-MAVEN_VERSION=3.5.4 \
-PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-_JAVA_OPTIONS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAM=3g"
+ENV AWS_CLI_VERSION=1.18.41
+ENV CLJOG_VERSION=1.1.0
+ENV CLOJURE_VERSION=1.10.1
+ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.536
+ENV DEBUG=1
+ENV MAVEN_HOME=/usr/lib/mvn
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /tmp
 
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
- && echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
- && echo "http://dl-cdn.alpinelinux.org/alpine/v3.9/community" >> /etc/apk/repositories \
- && apk --no-cache upgrade \
- && apk add --verbose --no-cache --upgrade --virtual .build-bus \
+RUN echo 'http://dl-cdn.alpinelinux.org/alpine/latest-stable/main' > /etc/apk/repositories \
+ && echo 'http://dl-cdn.alpinelinux.org/alpine/latest-stable/community' >> /etc/apk/repositories \
+ && apk update --verbose \
+ && apk upgrade --verbose \
+ #TODO remove specifying respository once we're using terraform 0.12 JESI-3036
+ && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
+    'terraform<0.12' \
+ #TODO remove specifying respository once openjdk14 is in latest-stable branch
+ && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' \
+    openjdk14 \
+ #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
+ && apk add --verbose \
     bash \
     build-base \
-    ca-certificates \
     chromium \
     chromium-chromedriver \
     coreutils \
@@ -43,7 +42,6 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/
     make \
     maven \
     ncurses \
-    openjdk8 \
     openssh \
     openssl \
     openssl-dev \
@@ -56,56 +54,39 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/
     rsync \
     shellcheck \
     tar \
-    'terraform<0.12' \
     the_silver_searcher \
     ttf-opensans \
     udev \
     util-linux \
     wget \
     zip \
+ && rm -rf /var/cache/apk \
  && chromedriver --version \
- && chromium-browser --version
+ && chromium-browser --version \
+ && java -version \
+ && mvn --version
 
 #--- Leiningen
-# https://hub.docker.com/_/clojure
-# https://github.com/Quantisan/docker-clojure/blob/master/target/openjdk-8-stretch/lein/Dockerfile
-RUN mkdir -p $LEIN_INSTALL \
- && wget -q https://raw.githubusercontent.com/technomancy/leiningen/$LEIN_VERSION/bin/lein-pkg \
- && echo 'Comparing lein-pkg checksum ...' \
- && sha256sum lein-pkg \
- && echo '36f879a26442648ec31cfa990487cbd337a5ff3b374433a6e5bf393d06597602 *lein-pkg' | sha256sum -c - \
- && mv lein-pkg $LEIN_INSTALL/lein \
- && chmod 0755 $LEIN_INSTALL/lein \
- && wget -q https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip \
- && mkdir -p /usr/share/java \
- && mv leiningen-$LEIN_VERSION-standalone.zip /usr/share/java/leiningen-$LEIN_VERSION-standalone.jar
+# Based on https://github.com/juxt/docker/blob/master/alpine-clojure/Dockerfile
+ENV LEIN_INSTALL=/usr/local/bin/lein \
+    LEIN_ROOT=1
 
-RUN echo '(defproject dummy "" :dependencies [[org.clojure/clojure "1.10.1"]])' > project.clj \
- && lein deps \
- && rm project.clj
-
-#--- Boot
-# https://github.com/Quantisan/docker-clojure/blob/master/target/openjdk-8/debian/boot/Dockerfile
-RUN mkdir -p $BOOT_INSTALL \
- && wget -q https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh \
- && echo "Comparing installer checksum..." \
- && echo "f717ef381f2863a4cad47bf0dcc61e923b3d2afb *boot.sh" | sha1sum -c - \
- && mv boot.sh $BOOT_INSTALL/boot \
- && chmod 0755 $BOOT_INSTALL/boot
-
-ENV PATH=$PATH:$BOOT_INSTALL
-ENV BOOT_AS_ROOT=yes
-RUN boot --update \
- && boot --version | sed 's/BOOT_CLOJURE_VERSION.*/BOOT_CLOJURE_VERSION=1.10.1/' > ~/.boot/boot.properties
+RUN apk add --no-cache --virtual .lein ca-certificates \
+ && wget 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein' \
+    -O $LEIN_INSTALL \
+ && chmod +x $LEIN_INSTALL \
+ && apk del .lein \
+ && lein --version
 
 #--- Clojure-Tools
 # https://clojure.org/guides/getting_started#_installation_on_linux
-RUN curl -O https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION}.sh \
- && chmod +x linux-install-${CLJ_TOOLS_VERSION}.sh \
+RUN wget "https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION}.sh" \
+ && chmod +x "linux-install-${CLJ_TOOLS_VERSION}.sh" \
  && ./linux-install-${CLJ_TOOLS_VERSION}.sh \
- && clojure -e '(println "IT WORKS!")'
+ && clojure -e '(println "IT WORKS!")' \
+ && rm linux-install-${CLJ_TOOLS_VERSION}.sh
 
-#--- Typical Node Tools
+#--- Node
 RUN npm install --global npm \
  && npm install --global \
     dry-dry \
@@ -114,44 +95,55 @@ RUN npm install --global npm \
     lumo-cljs \
     progress \
     remark-cli \
-    wait-on
+    wait-on \
+ && rm -rf $HOME/.npm
 
-#-- Typical Python Tools
+#-- Python
 RUN ln -s /usr/bin/python3 /usr/bin/python \
  && ln -s /usr/bin/pip3 /usr/bin/pip \
- && pip3 --no-cache-dir install --upgrade pip setuptools \
- && pip3 --no-cache-dir install  \
+ && pip3 install --upgrade pip setuptools \
+ && pip3 install \
     awscli==${AWS_CLI_VERSION} \
     azure-cli \
-    'colorama<0.4.0,>=0.3.9' \
-    'urllib3<1.25,>=1.24.1' \
     docker-compose \
+ && rm -rf $HOME/.cache \
  && aws --version \
  && az --version \
  && docker-compose --version
 
-#-- Install CircleCI Tools
-RUN git clone -b master https://github.com/jesims/circleci-tools.git \
- && cd circleci-tools \
- && git pull \
- && chmod +x ./cancel-redundant-builds.sh
-ENV PATH=$PATH:/tmp/circleci-tools/
-RUN node -v > .node_version
+#-- CircleCI Tools
+RUN wget 'https://raw.githubusercontent.com/jesims/circleci-tools/master/cancel-redundant-builds.sh' \
+    -O /usr/local/bin/cancel-redundant-builds.sh
 
-#-- Install cljog
-RUN wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog \
- && chmod ua+x cljog \
- && mv cljog /usr/local/bin/ \
- && wget https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj \
- && chmod u+x echo.clj \
+#-- cljog
+RUN wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog" \
+    -O /usr/local/bin/cljog \
+ && chmod +x /usr/local/bin/cljog \
+ && wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj" \
+ && chmod +x echo.clj \
  && ./echo.clj \
  && rm echo.clj
 
+#-- permissions
+RUN chmod -R a+rx /usr/local/bin/
+
+#-- cleanup
+RUN rm -rf \
+    /tmp/* \
+    /var/cache/apk \
+    $HOME/.cache \
+    $HOME/.npm
+
 #Bug in npm on AWS's Hyperv virtualization on M5 instances https://github.com/nodejs/docker-node/issues/813
-CMD npm config set unsafe-perm true
+RUN npm config set unsafe-perm true
 
 USER node
 
 ENV LEIN_ROOT=0
 
-CMD ["bash"]
+WORKDIR /home/node
+
+#-- create .node_version
+RUN node -v > .node_version
+
+ENTRYPOINT ["bash"]

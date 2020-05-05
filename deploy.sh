@@ -1,3 +1,11 @@
 #!/usr/bin/env bash
-docker build . -t jesiio/build-bus:latest --no-cache \
-	&& docker push jesiio/build-bus:latest
+set -e
+tag="${1:-latest}"
+image="jesiio/build-bus:$tag"
+echo "Building $image"
+docker build \
+	--no-cache \
+	--tag $image \
+	.
+echo "Deploying $image"
+docker push $image
