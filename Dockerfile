@@ -51,6 +51,8 @@ RUN echo 'http://dl-cdn.alpinelinux.org/alpine/latest-stable/main' > /etc/apk/re
     py3-pip \
     python3-dev \
     python3 \
+    # NPM node-sass requirement
+    python2 \
     rsync \
     shellcheck \
     tar \
@@ -64,7 +66,10 @@ RUN echo 'http://dl-cdn.alpinelinux.org/alpine/latest-stable/main' > /etc/apk/re
  && chromedriver --version \
  && chromium-browser --version \
  && java -version \
- && mvn --version
+ && mvn --version \
+ && python --version \
+ && python2 --version \
+ && python3 --version
 
 #--- Leiningen
 # Based on https://github.com/juxt/docker/blob/master/alpine-clojure/Dockerfile
@@ -99,7 +104,8 @@ RUN npm install --global npm \
  && rm -rf $HOME/.npm
 
 #-- Python
-RUN ln -s /usr/bin/python3 /usr/bin/python \
+RUN rm -f /usr/bin/python /usr/bin/pip \
+ && ln -s /usr/bin/python3 /usr/bin/python \
  && ln -s /usr/bin/pip3 /usr/bin/pip \
  && pip3 install --upgrade pip setuptools \
  && pip3 install \
