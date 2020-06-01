@@ -10,9 +10,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /tmp
 
-RUN echo 'http://dl-cdn.alpinelinux.org/alpine/latest-stable/main' > /etc/apk/repositories \
- && echo 'http://dl-cdn.alpinelinux.org/alpine/latest-stable/community' >> /etc/apk/repositories \
- && apk update --verbose \
+RUN apk update --verbose \
  && apk upgrade --verbose \
  #TODO remove specifying respository once we're using terraform 0.12 JESI-3036
  && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
