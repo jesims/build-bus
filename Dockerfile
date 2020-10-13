@@ -148,6 +148,9 @@ ENV LEIN_ROOT=0
 WORKDIR /home/node
 
 RUN export NODE_VERSION=$(node -v)
+
+RUN export JAVA_VERSION=$(java --version | head -1 | cut -f2 -d' ')
+
 RUN lein --version
 
 ENTRYPOINT ["bash"]
