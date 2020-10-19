@@ -15,9 +15,9 @@ RUN apk update --verbose \
  #TODO remove specifying respository once we're using terraform 0.12 JESI-3036
  && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
     'terraform<0.12' \
- #TODO remove specifying respository once openjdk15 is in latest-stable branch
+ #TODO remove specifying respository once openjdk14 is in latest-stable branch
  && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' \
-    openjdk15 \
+    openjdk14 \
  #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
  && apk add --verbose \
     bash \
