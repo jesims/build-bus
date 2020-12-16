@@ -1,7 +1,7 @@
 FROM node:12.20.0-alpine
 
 ENV AWS_CLI_VERSION=1.18.41
-ENV CLJOG_VERSION=1.1.0
+ENV CLJOG_VERSION=1.3.1
 ENV CLOJURE_VERSION=1.10.1
 ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.716
 ENV DEBUG=1
@@ -16,7 +16,7 @@ RUN apk update --verbose \
  && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
     'terraform<0.12' \
  #TODO remove specifying respository once openjdk15 is in latest-stable branch
- && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' \
+ && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/community' \
     openjdk15 \
  #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
  && apk add --verbose \
