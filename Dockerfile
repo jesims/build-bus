@@ -1,9 +1,9 @@
 FROM node:12.20.0-alpine
 
-ENV AWS_CLI_VERSION=1.18.41
+ENV AWS_CLI_VERSION=1.19.0
 ENV CLJOG_VERSION=1.3.1
-ENV CLOJURE_VERSION=1.10.1
-ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.716
+ENV CLOJURE_VERSION=1.10.2
+ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.796
 ENV DEBUG=1
 ENV MAVEN_HOME=/usr/lib/mvn
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
@@ -18,6 +18,8 @@ RUN apk update --verbose \
  #TODO remove specifying respository once openjdk15 is in latest-stable branch
  && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' \
     openjdk15 \
+ && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/community' \
+    shfmt \
  #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
  && apk add --verbose \
     bash \
@@ -53,7 +55,6 @@ RUN apk update --verbose \
     python2 \
     rsync \
     shellcheck \
-    shfmt \
     tar \
     the_silver_searcher \
     ttf-opensans \
