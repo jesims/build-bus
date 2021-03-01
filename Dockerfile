@@ -53,6 +53,7 @@ RUN apk update --verbose \
     python2 \
     rsync \
     shellcheck \
+    shfmt \
     tar \
     the_silver_searcher \
     ttf-opensans \
