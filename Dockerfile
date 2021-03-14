@@ -61,6 +61,7 @@ RUN apk update --verbose \
     udev \
     util-linux \
     wget \
+    xz \
     zip \
  && rm -rf /var/cache/apk \
  && chromedriver --version \
