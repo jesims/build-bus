@@ -35,6 +35,7 @@ RUN apk update --verbose \
     gifsicle \
     git \
     gnupg \
+    tidyhtml \
     jq \
     libc-dev \
     libffi-dev \
