@@ -149,7 +149,6 @@ RUN wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog" \
 #-- permissions
 RUN chmod -R a+rx /usr/local/bin/
 
-
 #-- cleanup
 RUN rm -rf \
     /tmp/* \
