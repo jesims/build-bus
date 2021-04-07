@@ -166,9 +166,10 @@ ENV LEIN_ROOT=0
 
 WORKDIR /home/node
 
+# Environment Vars for tools versions
 RUN export NODE_VERSION=$(node -v)
-
 RUN export JAVA_VERSION=$(java --version | head -1 | cut -f2 -d' ')
+RUN export DOTNET_VERSION=$(dotnet --version)
 
 ENV PATH="/usr/local/bin/dotnet:${PATH}"
 
