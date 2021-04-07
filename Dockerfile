@@ -172,7 +172,7 @@ RUN export DOTNET_VERSION=$(dotnet --version)
 
 ENV PATH="/usr/local/bin/dotnet:${PATH}"
 
-# verify installs
+# verify installs for node user
 RUN lein --version
 RUN dotnet --version
 
