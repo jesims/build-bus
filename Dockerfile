@@ -129,11 +129,9 @@ RUN rm -f /usr/bin/python /usr/bin/pip \
 #-- .NET SDK
 RUN wget https://dot.net/v1/dotnet-install.sh \
  && chmod +x ./dotnet-install.sh \
- && ./dotnet-install.sh -c ${DOT_NET_SDK_VERSION} \
- && echo 'export PATH="$HOME/.dotnet:$PATH"' >> ~/.bash_profile \
- && source ~/.bash_profile \
- && rm dotnet-install.sh \
- && dotnet --version
+ && ./dotnet-install.sh -c ${DOT_NET_SDK_VERSION} --install-dir /usr/local/bin/dotnet \
+ && chmod -R a+x /usr/local/bin/dotnet \
+ && rm dotnet-install.sh
 
 #-- CircleCI Tools
 RUN wget 'https://raw.githubusercontent.com/jesims/circleci-tools/master/cancel-redundant-builds.sh' \
@@ -150,6 +148,7 @@ RUN wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog" \
 
 #-- permissions
 RUN chmod -R a+rx /usr/local/bin/
+
 
 #-- cleanup
 RUN rm -rf \
@@ -171,6 +170,10 @@ RUN export NODE_VERSION=$(node -v)
 
 RUN export JAVA_VERSION=$(java --version | head -1 | cut -f2 -d' ')
 
+ENV PATH="/usr/local/bin/dotnet:${PATH}"
+
+# verify installs
 RUN lein --version
+RUN dotnet --version
 
 ENTRYPOINT ["bash"]
