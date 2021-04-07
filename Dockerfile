@@ -7,6 +7,7 @@ ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.796
 ENV DEBUG=1
 ENV MAVEN_HOME=/usr/lib/mvn
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV DOT_NET_SDK_VERSION=5.0
 
 WORKDIR /tmp
 
@@ -62,6 +63,14 @@ RUN apk update --verbose \
     util-linux \
     wget \
     zip \
+    # requirements for dotnet sdk
+    icu-libs \
+    krb5-libs \
+    libgcc \
+    libintl \
+    libssl1.1 \
+    libstdc++ \
+    zlib \
  && rm -rf /var/cache/apk \
  && chromedriver --version \
  && chromium-browser --version \
@@ -116,6 +125,15 @@ RUN rm -f /usr/bin/python /usr/bin/pip \
  && aws --version \
  && az --version \
  && docker-compose --version
+
+#-- .NET SDK
+RUN wget https://dot.net/v1/dotnet-install.sh \
+ && chmod +x ./dotnet-install.sh \
+ && ./dotnet-install.sh -c ${DOT_NET_SDK_VERSION} \
+ && echo 'export PATH="$HOME/.dotnet:$PATH"' >> ~/.bash_profile \
+ && source ~/.bash_profile \
+ && rm dotnet-install.sh \
+ && dotnet --version
 
 #-- CircleCI Tools
 RUN wget 'https://raw.githubusercontent.com/jesims/circleci-tools/master/cancel-redundant-builds.sh' \
