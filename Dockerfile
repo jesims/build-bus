@@ -7,6 +7,7 @@ ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.796
 ENV DEBUG=1
 ENV MAVEN_HOME=/usr/lib/mvn
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV DOT_NET_SDK_VERSION=5.0
 
 WORKDIR /tmp
 
@@ -63,6 +64,14 @@ RUN apk update --verbose \
     util-linux \
     wget \
     zip \
+    # requirements for dotnet sdk
+    icu-libs \
+    krb5-libs \
+    libgcc \
+    libintl \
+    libssl1.1 \
+    libstdc++ \
+    zlib \
  && rm -rf /var/cache/apk \
  && chromedriver --version \
  && chromium-browser --version \
@@ -118,6 +127,13 @@ RUN rm -f /usr/bin/python /usr/bin/pip \
  && az --version \
  && docker-compose --version
 
+#-- .NET SDK
+RUN wget https://dot.net/v1/dotnet-install.sh \
+ && chmod +x ./dotnet-install.sh \
+ && ./dotnet-install.sh -c ${DOT_NET_SDK_VERSION} --install-dir /usr/local/bin/dotnet \
+ && chmod -R a+x /usr/local/bin/dotnet \
+ && rm dotnet-install.sh
+
 #-- CircleCI Tools
 RUN wget 'https://raw.githubusercontent.com/jesims/circleci-tools/master/cancel-redundant-builds.sh' \
     -O /usr/local/bin/cancel-redundant-builds.sh
@@ -150,10 +166,15 @@ ENV LEIN_ROOT=0
 
 WORKDIR /home/node
 
+# Environment Vars for tools versions
 RUN export NODE_VERSION=$(node -v)
-
 RUN export JAVA_VERSION=$(java --version | head -1 | cut -f2 -d' ')
+RUN export DOTNET_VERSION=$(dotnet --version)
 
+ENV PATH="/usr/local/bin/dotnet:${PATH}"
+
+# verify installs for node user
 RUN lein --version
+RUN dotnet --version
 
 ENTRYPOINT ["bash"]
