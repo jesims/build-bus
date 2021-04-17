@@ -63,6 +63,7 @@ RUN apk update --verbose \
     udev \
     util-linux \
     wget \
+    xz \
     zip \
     # requirements for dotnet sdk
     icu-libs \
