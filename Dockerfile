@@ -1,4 +1,4 @@
-FROM node:12.20.0-alpine
+FROM node:16.2.0-alpine
 
 ENV AWS_CLI_VERSION=1.19.0
 ENV CLJOG_VERSION=1.3.1
