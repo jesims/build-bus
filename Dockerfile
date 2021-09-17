@@ -1,9 +1,9 @@
 FROM node:12.22.1-alpine3.11
 
-ENV AWS_CLI_VERSION=1.19.0
+ENV AWS_CLI_VERSION=1.20.3
 ENV CLJOG_VERSION=1.3.1
-ENV CLOJURE_VERSION=1.10.2
-ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.796
+ENV CLOJURE_VERSION=1.10.3
+ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.967
 ENV DEBUG=1
 ENV MAVEN_HOME=/usr/lib/mvn
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
@@ -125,6 +125,7 @@ RUN rm -f /usr/bin/python /usr/bin/pip \
  && rm -rf $HOME/.cache \
  && aws --version \
  && az --version \
+ && az extension add --name automation \
  && docker-compose --version
 
 #-- .NET SDK
