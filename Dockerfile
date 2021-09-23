@@ -120,13 +120,16 @@ RUN rm -f /usr/bin/python /usr/bin/pip \
  && pip3 install --upgrade pip setuptools \
  && pip3 install \
     awscli==${AWS_CLI_VERSION} \
-    azure-cli \
     docker-compose \
  && rm -rf $HOME/.cache \
  && aws --version \
- && az --version \
- && az extension add --name automation \
  && docker-compose --version
+
+RUN pip3 install azure-cli \
+ && az --version \
+ && az config set extension.use_dynamic_install=yes_without_prompt \
+ && az extension add --name automation \
+ && az automation --help
 
 #-- .NET SDK
 RUN wget https://dot.net/v1/dotnet-install.sh \
