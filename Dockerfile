@@ -120,16 +120,12 @@ RUN rm -f /usr/bin/python /usr/bin/pip \
  && pip3 install --upgrade pip setuptools \
  && pip3 install \
     awscli==${AWS_CLI_VERSION} \
+    azure-cli \
     docker-compose \
  && rm -rf $HOME/.cache \
  && aws --version \
- && docker-compose --version
-
-RUN pip3 install azure-cli \
  && az --version \
- && az config set extension.use_dynamic_install=yes_without_prompt \
- && az extension add --name automation \
- && az automation --help
+ && docker-compose --version
 
 #-- .NET SDK
 RUN wget https://dot.net/v1/dotnet-install.sh \
@@ -165,20 +161,24 @@ RUN rm -rf \
 RUN npm config set unsafe-perm true
 
 USER node
-
-ENV LEIN_ROOT=0
-
 WORKDIR /home/node
-
-# Environment Vars for tools versions
-RUN export NODE_VERSION=$(node -v)
-RUN export JAVA_VERSION=$(java --version | head -1 | cut -f2 -d' ')
-RUN export DOTNET_VERSION=$(dotnet --version)
-
 ENV PATH="/usr/local/bin/dotnet:${PATH}"
 
 # verify installs for node user
 RUN lein --version
 RUN dotnet --version
+
+#AZ configuration is user specific. This needs to be run under the node user
+RUN az --version \
+ && az config set extension.use_dynamic_install=yes_without_prompt \
+ && az extension add --name automation \
+ && az automation --help
+
+ENV LEIN_ROOT=0
+
+# Environment Vars for tools versions
+RUN export NODE_VERSION=$(node -v)
+RUN export JAVA_VERSION=$(java --version | head -1 | cut -f2 -d' ')
+RUN export DOTNET_VERSION=$(dotnet --version)
 
 ENTRYPOINT ["bash"]
