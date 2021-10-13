@@ -21,6 +21,7 @@ RUN apk update --verbose \
     openjdk17 \
  && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/community' \
     shfmt \
+    maven \
  #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
  && apk add --verbose \
     bash \
@@ -42,7 +43,6 @@ RUN apk update --verbose \
     libffi-dev \
     libjpeg-turbo-utils \
     make \
-    maven \
     ncurses \
     openssh \
     openssl \
