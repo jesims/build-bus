@@ -1,4 +1,4 @@
-FROM node:12.22.1-alpine3.11
+FROM node:12-alpine3.14
 
 ENV AWS_CLI_VERSION=1.20.3
 ENV CLJOG_VERSION=1.3.1
@@ -18,9 +18,10 @@ RUN apk update --verbose \
     'terraform<0.12' \
  #TODO remove specifying respository once openjdk15 is in latest-stable branch
  && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' \
-    openjdk15 \
+    openjdk17 \
  && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/community' \
     shfmt \
+    maven \
  #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
  && apk add --verbose \
     bash \
@@ -42,7 +43,6 @@ RUN apk update --verbose \
     libffi-dev \
     libjpeg-turbo-utils \
     make \
-    maven \
     ncurses \
     openssh \
     openssl \
