@@ -4,7 +4,7 @@ tag="${1:-latest}"
 image="jesiio/build-bus:$tag"
 echo "Building $image"
 docker build \
-	--no-cache \
+	--pull \
 	--tag $image \
 	.
 echo "Deploying $image"
