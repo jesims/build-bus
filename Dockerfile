@@ -1,4 +1,4 @@
-FROM node:12.22.1-alpine3.11
+FROM node:12.22.12-alpine3.15
 
 ENV AWS_CLI_VERSION=1.20.3
 ENV CLJOG_VERSION=1.3.1
@@ -13,16 +13,11 @@ WORKDIR /tmp
 
 RUN apk update --verbose \
  && apk upgrade --verbose \
- #TODO remove specifying respository once we're using terraform 0.12 JESI-3036
+ #TODO remove specifying repository once we're using terraform 0.12 JESI-3036
  && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
     'terraform<0.12' \
- #TODO remove specifying respository once openjdk15 is in latest-stable branch
- && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' \
-    openjdk15 \
- && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/edge/community' \
-    shfmt \
  #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
- && apk add --verbose \
+ && apk add --verbose --no-cache \
     bash \
     build-base \
     chromium \
@@ -44,6 +39,7 @@ RUN apk update --verbose \
     make \
     maven \
     ncurses \
+    openjdk15 \
     openssh \
     openssl \
     openssl-dev \
@@ -57,6 +53,7 @@ RUN apk update --verbose \
     python2 \
     rsync \
     shellcheck \
+    shfmt \
     tar \
     the_silver_searcher \
     ttf-opensans \
