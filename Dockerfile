@@ -1,6 +1,7 @@
 FROM node:12.22.12-alpine3.15
 
-ENV AWS_CLI_VERSION=1.20.3
+ENV AWS_CLI_VERSION=1.22.84
+ENV AZ_CLI_VERSION=2.30.0
 ENV CLJOG_VERSION=1.3.1
 ENV CLOJURE_VERSION=1.10.3
 ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.967
@@ -117,7 +118,7 @@ RUN rm -f /usr/bin/python /usr/bin/pip \
  && pip3 install --upgrade pip setuptools \
  && pip3 install \
     awscli==${AWS_CLI_VERSION} \
-    azure-cli \
+    azure-cli==${AZ_CLI_VERSION}  \
     docker-compose \
  && rm -rf $HOME/.cache \
  && aws --version \
