@@ -1,7 +1,7 @@
 FROM node:12.22.12-alpine3.15
 
-ENV AWS_CLI_VERSION=1.22.84
-ENV AZ_CLI_VERSION=2.30.0
+ENV AWS_CLI_VERSION=1.25.63
+ENV AZ_CLI_VERSION=2.39.0
 ENV CLJOG_VERSION=1.3.1
 ENV CLOJURE_VERSION=1.10.3
 ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.967
@@ -115,12 +115,13 @@ RUN npm install --global npm \
 RUN rm -f /usr/bin/python /usr/bin/pip \
  && ln -s /usr/bin/python3 /usr/bin/python \
  && ln -s /usr/bin/pip3 /usr/bin/pip \
- && pip3 install --upgrade pip setuptools \
- && pip3 install \
-    awscli==${AWS_CLI_VERSION} \
-    azure-cli==${AZ_CLI_VERSION}  \
-    docker-compose \
- && rm -rf $HOME/.cache \
+ && pip3 install --upgrade pipx \
+ && python3 -m pipx ensurepath
+
+RUN pipx install awscli==${AWS_CLI_VERSION}
+RUN pipx install azure-cli==${AZ_CLI_VERSION}
+RUN pipx install docker-compose
+RUN rm -rf $HOME/.cache \
  && aws --version \
  && az --version \
  && docker-compose --version
@@ -165,10 +166,11 @@ ENV PATH="/usr/local/bin/dotnet:${PATH}"
 # verify installs for node user
 RUN lein --version
 RUN dotnet --version
+RUN aws --version
+RUN az --version
 
 #AZ configuration is user specific. This needs to be run under the node user
-RUN az --version \
- && az config set extension.use_dynamic_install=yes_without_prompt \
+RUN az config set extension.use_dynamic_install=yes_without_prompt \
  && az extension add --name automation \
  && az automation --help
 
