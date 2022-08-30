@@ -178,4 +178,6 @@ RUN export NODE_VERSION=$(node -v)
 RUN export JAVA_VERSION=$(java --version | head -1 | cut -f2 -d' ')
 RUN export DOTNET_VERSION=$(dotnet --version)
 
+COPY ssh-config /home/node/.ssh/config
+
 ENTRYPOINT ["bash"]
