@@ -118,14 +118,6 @@ RUN rm -f /usr/bin/python /usr/bin/pip \
  && pip3 install --upgrade pipx \
  && python3 -m pipx ensurepath
 
-RUN pipx install awscli==${AWS_CLI_VERSION}
-RUN pipx install azure-cli==${AZ_CLI_VERSION}
-RUN pipx install docker-compose
-RUN rm -rf $HOME/.cache \
- && aws --version \
- && az --version \
- && docker-compose --version
-
 #-- .NET SDK
 RUN wget https://dot.net/v1/dotnet-install.sh \
  && chmod +x ./dotnet-install.sh \
@@ -161,13 +153,18 @@ RUN npm config set unsafe-perm true
 
 USER node
 WORKDIR /home/node
-ENV PATH="/usr/local/bin/dotnet:${PATH}"
+ENV PATH="/usr/local/bin/dotnet:/home/node/.local/bin:${PATH}"
 
 # verify installs for node user
 RUN lein --version
 RUN dotnet --version
-RUN aws --version
-RUN az --version
+
+RUN pipx install awscli==${AWS_CLI_VERSION}
+RUN pipx install azure-cli==${AZ_CLI_VERSION}
+RUN pipx install docker-compose
+RUN aws --version \
+ && az --version \
+ && docker-compose --version
 
 #AZ configuration is user specific. This needs to be run under the node user
 RUN az config set extension.use_dynamic_install=yes_without_prompt \
