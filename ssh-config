@@ -1,3 +1,5 @@
 Host *
     HostKeyAlgorithms +ssh-rsa
     PubkeyAcceptedKeyTypes +ssh-rsa
+    ServerAliveInterval 240
+    ServerAliveCountMax 5
