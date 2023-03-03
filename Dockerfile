@@ -1,7 +1,5 @@
-FROM node:12.22.12-alpine3.15
+FROM axrs/anvil:base-dart_2.17-java_17
 
-ENV AWS_CLI_VERSION=1.25.63
-ENV AZ_CLI_VERSION=2.33.1
 ENV CLJOG_VERSION=1.3.1
 ENV CLOJURE_VERSION=1.10.3
 ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.967
@@ -12,13 +10,10 @@ ENV DOT_NET_SDK_VERSION=5.0
 
 WORKDIR /tmp
 
-RUN apk update --verbose \
- && apk upgrade --verbose \
- #TODO remove specifying repository once we're using terraform 0.12 JESI-3036
- && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
-    'terraform<0.12' \
- #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
- && apk add --verbose --no-cache \
+#TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
+RUN apt update --verbose \
+ && apt upgrade --verbose \
+ && apt install --verbose \
     bash \
     build-base \
     chromium \
@@ -32,7 +27,6 @@ RUN apk update --verbose \
     gifsicle \
     git \
     gnupg \
-    tidyhtml \
     jq \
     libc-dev \
     libffi-dev \
@@ -40,7 +34,7 @@ RUN apk update --verbose \
     make \
     maven \
     ncurses \
-    openjdk15 \
+    openjdk17 \
     openssh \
     openssl \
     openssl-dev \
@@ -48,8 +42,10 @@ RUN apk update --verbose \
     pngquant \
     postgresql \
     py3-pip \
-    python3-dev \
     python3 \
+    python3-dev \
+    terraform \
+    tidyhtml \
     # NPM node-sass requirement
     python2 \
     rsync \
@@ -70,26 +66,14 @@ RUN apk update --verbose \
     libssl1.1 \
     libstdc++ \
     zlib \
- && rm -rf /var/cache/apk \
  && chromedriver --version \
  && chromium-browser --version \
  && java -version \
+ && lein --version \
  && mvn --version \
  && python --version \
  && python2 --version \
  && python3 --version
-
-#--- Leiningen
-# Based on https://github.com/juxt/docker/blob/master/alpine-clojure/Dockerfile
-ENV LEIN_INSTALL=/usr/local/bin/lein \
-    LEIN_ROOT=1
-
-RUN apk add --no-cache --virtual .lein ca-certificates \
- && wget 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein' \
-    -O $LEIN_INSTALL \
- && chmod +x $LEIN_INSTALL \
- && apk del .lein \
- && lein --version
 
 #--- Clojure-Tools
 # https://clojure.org/guides/getting_started#_installation_on_linux
