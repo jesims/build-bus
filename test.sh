@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
-image="jesiio/build-bus:test"
-docker build --tag $image .
+docker build --tag 'jesiio/build-bus:test' .

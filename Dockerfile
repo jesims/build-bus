@@ -1,28 +1,18 @@
-FROM node:12.22.12-alpine3.15
+FROM axrs/anvil:base-dart_2.17-dotnet_6.0-java_17-cloud
 
-ENV AWS_CLI_VERSION=1.25.63
-ENV AZ_CLI_VERSION=2.33.1
 ENV CLJOG_VERSION=1.3.1
 ENV CLOJURE_VERSION=1.10.3
 ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.967
 ENV DEBUG=1
 ENV MAVEN_HOME=/usr/lib/mvn
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV DOT_NET_SDK_VERSION=5.0
 
 WORKDIR /tmp
 
-RUN apk update --verbose \
- && apk upgrade --verbose \
- #TODO remove specifying repository once we're using terraform 0.12 JESI-3036
- && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
-    'terraform<0.12' \
- #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
- && apk add --verbose --no-cache \
+RUN apt update
+RUN apt upgrade --yes
+RUN apt install --yes \
     bash \
-    build-base \
-    chromium \
-    chromium-chromedriver \
     coreutils \
     curl \
     docker \
@@ -32,67 +22,55 @@ RUN apk update --verbose \
     gifsicle \
     git \
     gnupg \
-    tidyhtml \
     jq \
     libc-dev \
     libffi-dev \
-    libjpeg-turbo-utils \
     make \
     maven \
-    ncurses \
-    openjdk15 \
-    openssh \
     openssl \
-    openssl-dev \
     optipng \
     pngquant \
     postgresql \
-    py3-pip \
-    python3-dev \
     python3 \
-    # NPM node-sass requirement
-    python2 \
+    python3-dev \
+    python3-pip \
     rsync \
     shellcheck \
-    shfmt \
+    silversearcher-ag \
     tar \
-    the_silver_searcher \
-    ttf-opensans \
+    tidy \
     udev \
     util-linux \
     wget \
-    zip \
-    # requirements for dotnet sdk
-    icu-libs \
-    krb5-libs \
-    libgcc \
-    libintl \
-    libssl1.1 \
-    libstdc++ \
-    zlib \
- && rm -rf /var/cache/apk \
- && chromedriver --version \
- && chromium-browser --version \
+    zip
+RUN aws --version \
+ && az --version \
  && java -version \
+ && lein --version \
  && mvn --version \
- && python --version \
- && python2 --version \
+ && pip3 --version \
  && python3 --version
 
-#--- Leiningen
-# Based on https://github.com/juxt/docker/blob/master/alpine-clojure/Dockerfile
-ENV LEIN_INSTALL=/usr/local/bin/lein \
-    LEIN_ROOT=1
+#--- Newer versions
+RUN echo 'deb http://deb.debian.org/debian testing main' >> /etc/apt/sources.list
+RUN apt update
+RUN apt install --yes \
+    nodejs \
+    npm \
+    shfmt
+RUN node --version \
+ && npm --version \
 
-RUN apk add --no-cache --virtual .lein ca-certificates \
- && wget 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein' \
-    -O $LEIN_INSTALL \
- && chmod +x $LEIN_INSTALL \
- && apk del .lein \
- && lein --version
+#--- Terraform
+# https://www.hashicorp.com/official-packaging-guide
+RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+ && gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint \
+ && echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list \
+ && apt update \
+ && apt install --yes terraform
 
 #--- Clojure-Tools
-# https://clojure.org/guides/getting_started#_installation_on_linux
+# https://clojure.org/guides/install_clojure#_linux_instructions
 RUN wget "https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION}.sh" \
  && chmod +x "linux-install-${CLJ_TOOLS_VERSION}.sh" \
  && ./linux-install-${CLJ_TOOLS_VERSION}.sh \
@@ -100,8 +78,8 @@ RUN wget "https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION
  && rm linux-install-${CLJ_TOOLS_VERSION}.sh
 
 #--- Node
-RUN npm install --global npm \
- && npm install --global \
+RUN npm install --global npm
+RUN npm install --global \
     dry-dry \
     gulp-cli \
     local-web-server \
@@ -118,20 +96,12 @@ RUN rm -f /usr/bin/python /usr/bin/pip \
  && pip3 install --upgrade pipx \
  && python3 -m pipx ensurepath
 
-#-- .NET SDK
-RUN wget https://dot.net/v1/dotnet-install.sh \
- && chmod +x ./dotnet-install.sh \
- && ./dotnet-install.sh -c ${DOT_NET_SDK_VERSION} --install-dir /usr/local/bin/dotnet \
- && chmod -R a+x /usr/local/bin/dotnet \
- && rm dotnet-install.sh
-
 #-- CircleCI Tools
 RUN wget 'https://raw.githubusercontent.com/jesims/circleci-tools/master/cancel-redundant-builds.sh' \
     -O /usr/local/bin/cancel-redundant-builds.sh
 
 #-- cljog
-RUN wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog" \
-    -O /usr/local/bin/cljog \
+RUN wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog" -O /usr/local/bin/cljog \
  && chmod +x /usr/local/bin/cljog \
  && wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/example-scripts/echo.clj" \
  && chmod +x echo.clj \
@@ -142,29 +112,21 @@ RUN wget "https://raw.githubusercontent.com/axrs/cljog/${CLJOG_VERSION}/cljog" \
 RUN chmod -R a+rx /usr/local/bin/
 
 #-- cleanup
-RUN rm -rf \
+RUN apt clean \
+ && apt autoremove --yes \
+ && rm -rf \
     /tmp/* \
     /var/cache/apk \
     $HOME/.cache \
     $HOME/.npm
 
-#Bug in npm on AWS's Hyperv virtualization on M5 instances https://github.com/nodejs/docker-node/issues/813
-RUN npm config set unsafe-perm true
+#-- docker-compose
+RUN pipx install docker-compose \
+ && docker-compose --version
 
 USER node
 WORKDIR /home/node
 ENV PATH="/usr/local/bin/dotnet:/home/node/.local/bin:${PATH}"
-
-# verify installs for node user
-RUN lein --version
-RUN dotnet --version
-
-RUN pipx install awscli==${AWS_CLI_VERSION}
-RUN pipx install azure-cli==${AZ_CLI_VERSION}
-RUN pipx install docker-compose
-RUN aws --version \
- && az --version \
- && docker-compose --version
 
 #AZ configuration is user specific. This needs to be run under the node user
 RUN az config set extension.use_dynamic_install=yes_without_prompt \
