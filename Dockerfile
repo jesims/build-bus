@@ -101,8 +101,7 @@ RUN wget "https://download.clojure.org/install/linux-install-${CLJ_TOOLS_VERSION
  && rm linux-install-${CLJ_TOOLS_VERSION}.sh
 
 #--- Node
-RUN npm install --global npm \
- && npm install --global \
+RUN npm install --global \
     dry-dry \
     gulp-cli \
     local-web-server \
