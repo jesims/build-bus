@@ -8,17 +8,19 @@ ENV CLJ_TOOLS_VERSION=${CLOJURE_VERSION}.967
 ENV DEBUG=1
 ENV MAVEN_HOME=/usr/lib/mvn
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV DOT_NET_SDK_VERSION=5.0
+ENV DOT_NET_SDK_VERSION=6.0
 
 WORKDIR /tmp
 
-RUN apk update --verbose \
- && apk upgrade --verbose \
- #TODO remove specifying repository once we're using terraform 0.12 JESI-3036
- && apk add --verbose --no-cache --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
+RUN apk update --verbose
+RUN apk upgrade --verbose
+RUN apk add --verbose --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.15/community' \
+    shellcheck \
+#TODO remove specifying repository once we're using terraform 0.12 JESI-3036
+RUN apk add --verbose --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
     'terraform<0.12' \
- #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
- && apk add --verbose --no-cache \
+#TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
+RUN apk add --verbose \
     bash \
     build-base \
     chromium \
@@ -53,7 +55,6 @@ RUN apk update --verbose \
     # NPM node-sass requirement
     python2 \
     rsync \
-    shellcheck \
     shfmt \
     tar \
     the_silver_searcher \
@@ -69,9 +70,9 @@ RUN apk update --verbose \
     libintl \
     libssl1.1 \
     libstdc++ \
-    zlib \
- && rm -rf /var/cache/apk \
- && chromedriver --version \
+    zlib
+RUN rm -rf /var/cache/apk
+RUN chromedriver --version \
  && chromium-browser --version \
  && java -version \
  && mvn --version \
