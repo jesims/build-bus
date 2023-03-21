@@ -5,7 +5,9 @@ image="jesiio/build-bus:$tag"
 echo "Building $image"
 docker build \
 	--pull \
-	--tag $image \
+	--no-cache \
+	--platform=x86_64 \
+	--tag="$image" \
 	.
 echo "Deploying $image"
-docker push $image
+docker push "$image"
