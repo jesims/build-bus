@@ -15,10 +15,10 @@ WORKDIR /tmp
 RUN apk update --verbose
 RUN apk upgrade --verbose
 RUN apk add --verbose --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.15/community' \
-    shellcheck \
+    shellcheck
 #TODO remove specifying repository once we're using terraform 0.12 JESI-3036
 RUN apk add --verbose --repository 'http://dl-cdn.alpinelinux.org/alpine/v3.9/community' \
-    'terraform<0.12' \
+    'terraform<0.12'
 #TODO move build specific deps (e.g. gcc, lib*) to build specific virtual packages
 RUN apk add --verbose \
     bash \
